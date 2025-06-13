@@ -45,6 +45,7 @@
             collection.getTextArrayFromMarkdownTable = function (array) {
                 array = array.filter(function (row, i, table) {
                     if (i == 1 && array[i].join().match(/^.*-{3,}.*$/)) return false;
+                    if (i == array.length - 1 && row.length == 1 && !row[0].length) return false;
                     return true;
                 });
                 array.forEach(function (row, i, table) {
