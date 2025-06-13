@@ -622,16 +622,16 @@ CollectionManager.selectDeveloperStencilDir = function () {
             { name: "Definition.xml", extensions: ["xml"] }
         ]
 
-    }, function (filenames) {
-
+    }).then(function (result) {
+        var filePaths = result.filePaths;
         ApplicationPane._instance.unbusy();
-        if (!filenames || filenames.length <= 0) return;
-        var filePath = filenames[0];
+        if (!filePaths || filePaths.length <= 0) return;
+        var filePath = filePaths[0];
         if (path.basename(filePath) != "Definition.xml") {
             Dialog.error("The selected file is invalid. Please select the 'Definition.xml' file of your stencil.");
             return;
         }
-        Config.set("dev.stencil.path", filenames[0]);
+        Config.set("dev.stencil.path", filePaths[0]);
         CollectionManager.loadStencils();
     }.bind(this));
 };
