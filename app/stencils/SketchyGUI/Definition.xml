@@ -45,6 +45,19 @@
 
                 return c;
             };
+            collection.getTextArrayFromMarkdownTable = function (array) {
+                array = array.filter(function (row, i, table) {
+                    if (i == 1 && array[i].join().match(/^.*-{3,}.*$/)) return false;
+                    return true;
+                });
+                array.forEach(function (row, i, table) {
+                    table[i] = row.filter(function (cell, j) {
+                        if (j == 0 || j == row.length - 1) return !(cell.length == 0);
+                        return true;
+                    });
+                });
+                return array;
+            }
             collection.getMaxXForColumnHandle = function (i, properties) {
                 var cols = this.getMaxColumns(properties["content"].value);
                 if (i < cols - 2) {
@@ -1658,7 +1671,7 @@ MenuItem]]></Property>
                 <DomContent>
                     <![CDATA[
                         var gen = function (isHeader, content, colIndex, colCount, height) {
-                            var a = F.parseTextArray($content.value);
+                            var a = collection.getTextArrayFromMarkdownTable(F.parseTextArray($content.value));
                             var style = new CSS();
                             content = content.replace("\r", "<br />");
 
@@ -1742,7 +1755,7 @@ MenuItem]]></Property>
                                         height: "19"
                                     }
                                 );
-                            } else if (content.match(/^[ \t]*\[\*\][ \t]*$/)) {
+                            } else if (content.match(/^[ \t]*\[\*\]|\[x\][ \t]*$/)) {
                                 div._children.push(
                                     {
                                         _name: "img",
@@ -1762,7 +1775,7 @@ MenuItem]]></Property>
                                         height: "17"
                                     }
                                 );
-                            } else if (content.match(/^[ \t]*\(\*\)[ \t]*$/)) {
+                            } else if (content.match(/^[ \t]*\(\*\)|\(\x\)[ \t]*$/)) {
                                 div._children.push(
                                     {
                                         _name: "img",
@@ -1790,7 +1803,8 @@ MenuItem]]></Property>
                         //depends $headerHeight $h0 $h1 $h2 $h3 $h4 $h5 $h6 $h7 $h8 $h9 $h10 $h11 $box
                         var fragment = null;
                         try {
-                            var a = F.parseTextArray($content.value);
+                            var a = collection.getTextArrayFromMarkdownTable(F.parseTextArray($content.value));
+
                             Console.log("TABLEARRAY" + a);
                             var cols = collection.getMaxColumns($content.value);
 
@@ -1899,7 +1913,7 @@ MenuItem]]></Property>
                 <![CDATA[
                     //depends $h0 $h1 $h2 $h3 $h4 $h5 $h6 $h7 $h8 $h9 $h10 $h11 $box $headerHeight
                     //depends also: $textFont, $customStyle, $padding
-                    var a = F.parseTextArray($content.value);
+                    var a = collection.getTextArrayFromMarkdownTable(F.parseTextArray($content.value));
                     var row = a.length;
                     var minHeight = F.textSize("htmlObject").h;
                     var h = Math.max(minHeight, $box.h)
@@ -1930,7 +1944,7 @@ MenuItem]]></Property>
                     //depends also: $textFont, $customStyle, $padding
                     var minHeight = F.textSize("htmlObject").h;
                     var h = Math.max(minHeight, $box.h)
-                    var a = F.parseTextArray($content.value);
+                    var a = collection.getTextArrayFromMarkdownTable(F.parseTextArray($content.value));
 
                     if (a.length > 0) {
                         col = a[0].length;
@@ -1957,7 +1971,7 @@ MenuItem]]></Property>
                 <StrokeStyle>$strokeStyle</StrokeStyle>
                 <D>
                 <![CDATA[
-                    var r = F.parseTextArray($content.value).length;
+                    var r = collection.getTextArrayFromMarkdownTable(F.parseTextArray($content.value)).length;
                     var minHeight = F.textSize("htmlObject").h;
                     var h = Math.max(minHeight, $box.h)
                     h = h / r;
